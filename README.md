@@ -1,3 +1,6 @@
+download requirements.txt then proceed to open main_hub.py
+
+
 <div align="center">
   <p>
     <a align="center" href="https://ultralytics.com/yolov5" target="_blank">
