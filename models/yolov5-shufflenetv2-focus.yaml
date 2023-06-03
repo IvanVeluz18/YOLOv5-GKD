@@ -1,0 +1,75 @@
+'''
+Program Title: YOLOv5 - GKD: Real-Time Weapon Detection for Surveillance Using Enhanced YOLOv5
+
+Programmers:    Veluz, John Ivan V.
+                Flores, Julius Martin A.
+                Paragoya, Vince M.
+                Sembrano, Robert Vince M.
+
+Where the Program Fits in the General System Design:
+                This is the structure of the YOLOv5-GKD Algorithm
+
+Date Written: November 27, 2022
+Date Revised: January 30, 2023
+
+Purpose of the Program:
+
+The creation of this system has the primary goal of creating a real-time weapon detection system that is able to
+detect Filipino made and improvised weapon using the latest algorithm along with some modifications to the structure
+to make the detection faster and more accurate even when the object to be detected is small and even when the lighting
+condition is different.
+
+The system used the following Data Structures, Algorithms, and Control:
+
+Data Structures, Algorithms, and Control:
+    Data Structures: Lists, Sets
+
+'''
+
+# parameters
+nc: 80  # number of classes
+depth_multiple: 1.0  # model depth multiple
+width_multiple: 0.5  # layer channel multiple
+
+# anchors
+anchors:
+  - [4,5,  8,10,  13,16]  # P3/8
+  - [23,29,  43,55,  73,105]  # P4/16
+  - [146,217,  231,300,  335,433]  # P5/32
+
+# Custom backbone for YOLOv5
+# ShuffleNetv2
+backbone:
+  # [from, number, module, args]
+  [[-1, 1, Focus, [64, 3]],    # 0-P2/4
+   [-1, 1, InvertedResidual, [128, 2]], # 1-P3/8
+   [-1, 3, InvertedResidual, [128, 1]], # 2
+   [-1, 1, InvertedResidual, [256, 2]], # 3-P4/16
+   [-1, 7, InvertedResidual, [256, 1]], # 4
+   [-1, 1, InvertedResidual, [512, 2]], # 5-P5/32
+   [-1, 3, InvertedResidual, [512, 1]], # 6
+  ]
+
+# YOLOv5 head
+head:
+  # [from, number, module, args]
+  [[-1, 1, Conv, [128, 1, 1]],
+   [-1, 1, nn.Upsample, [None, 2, 'nearest']],
+   [[-1, 4], 1, Concat, [1]],  # cat backbone P4
+   [-1, 1, C3, [128, False]],  # 10
+
+   [-1, 1, Conv, [128, 1, 1]],
+   [-1, 1, nn.Upsample, [None, 2, 'nearest']],
+   [[-1, 2], 1, Concat, [1]],  # cat backbone P3
+   [-1, 1, C3, [128, False]],  # 14 (P3/8-small)
+
+   [-1, 1, Conv, [128, 3, 2]],
+   [[-1, 11], 1, Concat, [1]],  # cat head P4
+   [-1, 1, C3, [128, False]],  # 17 (P4/16-medium)
+
+   [-1, 1, Conv, [128, 3, 2]],
+   [[-1, 7], 1, Concat, [1]],  # cat head P5
+   [-1, 1, C3, [128, False]],  # 20 (P5/32-large)
+
+   [[14, 17, 20], 1, Detect, [nc, anchors]],  # Detect(P3, P4, P5)
+]
