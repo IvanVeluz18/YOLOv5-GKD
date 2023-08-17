@@ -5,11 +5,10 @@ download requirements.txt then proceed to open main_hub.py
 
 ![sample input](https://github.com/IvanVeluz18/YOLOv5-GKD/assets/39522016/f0109c4a-93d8-4409-9c2e-052b46fc964d)
 
-
-
-
-
-
+<br>
+<br>
+<br>
+<br>
 
 <div align="center">
   <p>
